@@ -6,6 +6,8 @@ This is the third project of the Udactiy's Self-Driving Car Nanodegree. In this 
 [Track Two]()
 
 ## Software
+Software requirements:
+* numpy * flask-socketio * eventlet * pillow * h5py * keras * Tensorflow</br>
 Simulator can be found at:</br>
 [Windows 64 bit](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f3a4_simulator-windows-64/simulator-windows-64.zip)</br>
 [Windows 32 bit](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f4b6_simulator-windows-32/simulator-windows-32.zip)</br>
@@ -14,9 +16,6 @@ Simulator can be found at:</br>
 
 #### The simulator
 ![](/images/simulator.png "simulator")
-
-Software requirements:
-* numpy * flask-socketio * eventlet * pillow * h5py * keras * Tensorflow
 
 ## Data and augmentation
 The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
