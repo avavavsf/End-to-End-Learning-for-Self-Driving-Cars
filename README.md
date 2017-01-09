@@ -12,14 +12,11 @@ Simulator can be found at:</br>
 [macOS](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f290_simulator-macos/simulator-macos.zip)</br>
 [Linux](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f0f7_simulator-linux/simulator-linux.zip)</br>
 
+#### The simulator
+![](/images/simulator.png "simulator")
+
 Software requirements:
-* numpy
-* flask-socketio
-* eventlet
-* pillow
-* h5py
-* keras
-* Tensorflow
+* numpy * flask-socketio * eventlet * pillow * h5py * keras * Tensorflow
 
 ## Data and augmentation
 The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
