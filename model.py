@@ -18,118 +18,90 @@ from keras.models import model_from_json
 from keras import backend as K
 #import pickle
 #import random
+import pandas as pd
 import numpy as np
 import tensorflow as tf
 #import sklearn
-#import cv2
+import cv2
 from sklearn.model_selection import train_test_split
 #from tensorflow.contrib.layers import flatten
-import matplotlib.image as mpimg
 print("Finish software module")
 
 # Load datadata
 print("Start data loading")
 # need to revise on OSU OSC
+#features_directory = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/'
+#labels_file= '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/driving_log.csv'
 features_directory = './training_data/'
-#labels_file= './training_data/test.csv'
-labels_file= './training_data/driving_log.csv'
-labels = []
-features = []
+labels_file= './training_data/test.csv'
+
+## split the data into 80% training, 20% validation
+n_ep = 0
 with open(labels_file, mode='r') as f:
     reader = csv.reader(f, delimiter=',')
-    headers = next(reader)
     for row in reader:
-        labels.append(float(row[3]))
-        #only use the center images
-        features_file = features_directory + row[0]
-        img=mpimg.imread(features_file)
-        features.append(img)
-print("Finish data loading")
-#print(labels)
-#print(features[0])
-print("Start training/validation/testing splitting")
-# split the data into 70% training, 15% validation, and 15% testing
-train_features, validation_test_features, train_labels, validation_test_labels = train_test_split(
-   features,
-   labels,
-   test_size=0.2,
-   random_state=26746
-)
-del features, labels
-test_features, validation_features, test_labels, validation_labels = train_test_split(
-   validation_test_features,
-   validation_test_labels,
-   test_size=0.5,
-   random_state=38562
-)
-del validation_test_features, validation_test_labels
-train_features = np.array(train_features)
-validation_features = np.array(validation_features)
-test_features = np.array(test_features)
-print("Number of training examples =", len(train_features))
-print("Number of validation examples =", len(validation_features))
-print("Number of testing examples =", len(test_features))
-print("Image data shape =", train_features[0].shape)
-print("Training data shape =", train_features.shape)
+        n_ep = n_ep + 1
+n_ep = n_ep - 1        
+print('the number of epoch is ', n_ep)    
+arr = np.arange(n_ep)
+np.random.shuffle(arr)
+t = arr[:int(n_ep * 0.8)]
+v = arr[int(n_ep * 0.8):]
 
-print("Finish training/validation/testing splitting")
-
-
-print("Start preprocess")
-#define a min-max scaling function used to normalize the image data
-def normalize_inputimage(image_data):
-    """
-    Normalize the image data with Min-Max scaling to a range of [0.1, 0.9]
-    :param image_data: The image data to be normalized
-    :return: Normalized image data
-    """
-    a = 0.1
-    b = 0.9
-    greyscale_min = 0
-    greyscale_max = 255
-    return a + ( ( (image_data - greyscale_min)*(b - a) )/( greyscale_max - greyscale_min ) )
-
-def transform_image(img,ang_range):
-    #1- Image
-    #2- ang_range: Range of angles for rotation   
-
-    # Rotation
-    ang_rot = np.random.uniform(ang_range)-ang_range/2
-    rows,cols,ch = img.shape    
-    Rot_M = cv2.getRotationMatrix2D((cols/2,rows/2),ang_rot,1)
-        
-    img = cv2.warpAffine(img,Rot_M,(cols,rows))
-
+def read_image(file_name):
+    img = cv2.imread(file_name)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     return img
 
+# the generator
+def generator(train_or_valid,batch_size):
+    labels = []
+    features = []
+    while 1:
+        if train_or_valid == "train":
+            ibatch = np.random.choice(t, batch_size)
+        elif train_or_valid == "valid":
+            ibatch = np.random.choice(v, batch_size)
+        else:
+            print('wrong key words, sould be either train or valid ')
 
-#generate new training data to make the data balance
-#inputs_per_class = np.bincount(y_train)
-# each class will have 2800-3200 training examples 
-#for i in range(len(inputs_per_class)):
-#    add_number = 3000 + random.randint(-200, 200) - inputs_per_class[i]
-#    
-#    new_features = []
-#    new_labels = []
-#    mask = np.where(y_train == i)
-#    features = X_train[mask]
-#    for j in range(add_number):
-#        index = random.randint(0, inputs_per_class[i] - 1)
-#        new_features.append(transform_image(features[index],20))
-#        new_labels.append(i)
-#    X_train = np.append(X_train, new_features, axis=0)
-#    y_train = np.append(y_train, new_labels, axis=0)
-#del new_features, new_labels
-
-#Normorlization, scale the image data from [0 255] to [0.1 0.9]
-#train_features = normalize_inputimage(train_features)
-#validation_features = normalize_inputimage(validation_features)
-#test_features = normalize_inputimage(test_features)
-
-print('Finish preprocess')
-
-
-
+        df=pd.read_csv(labels_file, sep=',',header=None)
+        for index in ibatch:
+            camera_index = np.random.randint(3)
+            features_file = features_directory + df[camera_index][index + 1].strip()
+            img = read_image(features_file)
+            steer = float(df[3][index + 1])
+            #center camera
+            if camera_index == 0:
+                flip_index = np.random.randint(2)
+                if flip_index == 0:
+                    features.append(img)
+                    labels.append(steer)
+                else:
+                    img = cv2.flip(img,1)
+                    features.append(cv2.flip(img,1))
+                    labels.append(steer * (-1.0))
+            #left camera       
+            elif camera_index == 1:
+                flip_index = np.random.randint(2)
+                if flip_index == 0:
+                    features.append(img)
+                    labels.append(steer + 0.25)
+                else:
+                    img = cv2.flip(img,1)
+                    features.append(cv2.flip(img,1))
+                    labels.append((steer + 0.25)* (-1.0))
+            #right camera
+            else:
+                flip_index = np.random.randint(2)
+                if flip_index == 0:
+                    labels.append(steer - 0.25)
+                    features.append(cv2.flip(img,1))
+                else:
+                    img = cv2.flip(img,1)
+                    features.append(cv2.flip(img,1))
+                    labels.append((steer - 0.25) * (-1.0))
+    return features, labels                                                       
 
 def Steering_Model(cameraFormat=(3, 160, 320)):
     """
@@ -194,10 +166,7 @@ def Steering_Model(cameraFormat=(3, 160, 320)):
     model.add(Activation('relu'))
     model.add(Dense(1, init = 'normal', name = "dense_4"))
 
-    model.summary()
-    # Adam optimizer is a standard, efficient SGD optimization method
-     # Loss function is mean squared error, standard for regression problems
-    model.compile(optimizer="adam", loss="mse")
+    model.summary()    
 
     return model
 
@@ -206,21 +175,26 @@ print('Start training model')
 
 #train
 model = Steering_Model()
-history = model.fit(train_features, train_labels,
-                    batch_size=128, nb_epoch=1,
-                    verbose=1, validation_data=(validation_features, validation_labels))
-print(history.history)
+# Adam optimizer is a standard, efficient SGD optimization method
+# Loss function is mean squared error, standard for regression problems
+#adam = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+model.compile(optimizer="adam", loss="mse")
+#8036*3*2*0.8/256=151
+#8036*3*2*0.2/128=76
+history = model.fit_generator(generator('train',256),
+        samples_per_epoch=151, nb_epoch=7,validation_data=generator('train',256),
+                    nb_val_samples=76)
+
 print('Finish training model')
 print('Start save model architecture and weights')
 #save the model architecture
 json_model = model.to_json()
-with open("model.json", "w") as f:
+#with open("/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model.json", "w") as f:
+#    f.write(json_model)
+with open("./model.json", "w") as f:
     f.write(json_model)
 #save the model weights
-model.save_weights("model.h5")
+#model.save_weights("/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model.h5")
+model.save_weights("./model.h5")
 print('Finish save model architecture and weights')
 
-
-#test after satisfying with the validation accuracy.
-#Returns the loss value and metrics values for the model in test mode
-#model.evaluate(test_features, test_labels, batch_size=128)
