@@ -33,7 +33,7 @@ print("Start data loading")
 #features_directory = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/'
 #labels_file= '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/driving_log.csv'
 features_directory = './training_data/'
-labels_file= './training_data/test.csv'
+labels_file= './training_data/driving_log.csv'
 
 ## split the data into 80% training, 20% validation
 n_ep = 0
@@ -50,6 +50,7 @@ v = arr[int(n_ep * 0.8):]
 
 def read_image(file_name):
     img = cv2.imread(file_name)
+    img = cv2.resize(img, (200, 66), interpolation=cv2.INTER_AREA)
     img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     return img
 
@@ -101,9 +102,9 @@ def generator(train_or_valid,batch_size):
                     img = cv2.flip(img,1)
                     features.append(cv2.flip(img,1))
                     labels.append((steer - 0.25) * (-1.0))
-    return features, labels                                                       
+    	yield features, labels                                                       
 
-def Steering_Model(cameraFormat=(3, 160, 320)):
+def Steering_Model(cameraFormat=(3, 66, 200)):
     """
     The intent is a scaled down version of the model from "End to End Learning
     for Self-Driving Cars": https://arxiv.org/abs/1604.07316.
@@ -182,7 +183,7 @@ model.compile(optimizer="adam", loss="mse")
 #8036*3*2*0.8/256=151
 #8036*3*2*0.2/128=76
 history = model.fit_generator(generator('train',256),
-        samples_per_epoch=151, nb_epoch=7,validation_data=generator('train',256),
+        samples_per_epoch=151, nb_epoch=7,validation_data=generator('valid',128),
                     nb_val_samples=76)
 
 print('Finish training model')
