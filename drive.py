@@ -1,6 +1,7 @@
 import argparse
 import base64
 import json
+import cv2
 
 import numpy as np
 import socketio
@@ -25,6 +26,18 @@ app = Flask(__name__)
 model = None
 prev_image_array = None
 
+def preprocess_image(image):
+
+    n_row, n_col, n_ch = image.shape
+    # This removes most of the area above the road and small amount below including the hood
+    new_image = image[int(n_row * 0.33):int(n_row * 0.875), :]
+
+    # This is NVIDIA's input parameters
+    new_image = cv2.resize(new_image, (200,66), interpolation=cv2.INTER_AREA)
+    
+    return new_image
+
+
 @sio.on('telemetry')
 def telemetry(sid, data):
     # The current steering angle of the car
@@ -37,6 +50,7 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
+    image_array = preprocess_image(image_array)
     transformed_image_array = image_array[None, :, :, :]
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
