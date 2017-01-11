@@ -21,7 +21,7 @@ Software requirements:
 The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
 
 ## Model architecture
-
+I start with the Nvidia End-to-end learning deep learning architecture.
 ## Hyperparameters
 
 ## Results
