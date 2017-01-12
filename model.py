@@ -34,6 +34,37 @@ print("Start data loading")
 #labels_file= '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/driving_log.csv'
 features_directory = './training_data/'
 labels_file= './training_data/driving_log.csv'
+#define the input image shape
+row = 66
+col = 200
+ch = 3 
+
+def bright_augment(img):
+    img1 = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
+    random_bright = .25 + np.random.uniform()
+    #print(random_bright)
+    #print(img1[:,:,2])
+    img1[:,:,2] = img1[:,:,2]*random_bright
+    img1 = cv2.cvtColor(img1,cv2.COLOR_HSV2RGB)
+    return img1
+
+# This removes most of the area above the road and small amount below including the hood
+def chop_image(img):
+    n_row,n_col, n_ch = img.shape
+    img1 = img[int(n_row * 0.33):int(n_row * 0.875), :]
+    return img1
+    
+def resize_image(img):
+    img1 = cv2.resize(img, (200,66), interpolation=cv2.INTER_AREA)
+    return img1
+
+def read_image(file_name):
+    img = cv2.imread(file_name)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    img = chop_image(img)
+    img = resize_image(img)
+    img = bright_augment(img)
+    return img
 
 ## split the data into 80% training, 20% validation
 n_ep = 0
@@ -48,33 +79,43 @@ np.random.shuffle(arr)
 t = arr[:int(n_ep * 0.8)]
 v = arr[int(n_ep * 0.8):]
 
-def read_image(file_name):
-    img = cv2.imread(file_name)
-    img = cv2.resize(img, (200, 66), interpolation=cv2.INTER_AREA)
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    return img
-
 # the generator
-def generator(train_or_valid,batch_size):
+def data_generator(train_or_valid,batch_size):
+    #labels = np.zeros(batch_size)
+    #features = np.zeros((batch_size, row, col, 3))
     labels = []
     features = []
-    while 1:
-        if train_or_valid == "train":
-            ibatch = np.random.choice(t, batch_size)
-        elif train_or_valid == "valid":
-            ibatch = np.random.choice(v, batch_size)
-        else:
-            print('wrong key words, sould be either train or valid ')
+    ajusteed_angle = 0.15
+    df=pd.read_csv(labels_file, sep=',',header=None)
+    while True:
+        n_sample = 0
+        while n_sample < batch_size:
+            print(n_sample)
+            #decide if train batch or valid batch
+            if train_or_valid == "train":
+                index = np.random.choice(t, 1)
+            elif train_or_valid == "valid":
+                index = np.random.choice(v, 1)
+            else:
+                print('wrong key words, sould be either train or valid ')
+            #only choose the image 
+            #index = 6913
 
-        df=pd.read_csv(labels_file, sep=',',header=None)
-        for index in ibatch:
-            camera_index = np.random.randint(3)
-            features_file = features_directory + df[camera_index][index + 1].strip()
+            print("index",int(index))
+            #camera_index = np.random.randint(3)
+            camera_index = 1
+
+            print("camera_index",camera_index)
+            print(df.values[index+1][0][camera_index])
+            features_file = features_directory + df.values[index+1][0][camera_index].strip()
+            print("floateatures_file",features_file)
             img = read_image(features_file)
-            steer = float(df[3][index + 1])
+            steer = float(df[3][index+1])
+            print('steer',steer)
             #center camera
             if camera_index == 0:
                 flip_index = np.random.randint(2)
+                #flip_index = 0
                 if flip_index == 0:
                     features.append(img)
                     labels.append(steer)
@@ -87,32 +128,35 @@ def generator(train_or_valid,batch_size):
                 flip_index = np.random.randint(2)
                 if flip_index == 0:
                     features.append(img)
-                    labels.append(steer + 0.25)
+                    labels.append(steer + ajusteed_angle)
                 else:
                     img = cv2.flip(img,1)
                     features.append(cv2.flip(img,1))
-                    labels.append((steer + 0.25)* (-1.0))
+                    labels.append((steer + ajusteed_angle)* (-1.0))
             #right camera
-            else:
+            else:               
                 flip_index = np.random.randint(2)
                 if flip_index == 0:
-                    labels.append(steer - 0.25)
+                    labels.append(steer - ajusteed_angle)
                     features.append(cv2.flip(img,1))
                 else:
                     img = cv2.flip(img,1)
                     features.append(cv2.flip(img,1))
-                    labels.append((steer - 0.25) * (-1.0))
-    	yield features, labels                                                       
+                    labels.append((steer - ajusteed_angle) * (-1.0))
+            print(n_sample)
+            n_sample = n_sample + 1    
+            #if abs(labels[-1]) > 0.05:
+            #    n_sample = n_sample + 1
+            #else:
+            #    features.pop()
+            #    labels.pop()
+        yield np.array(features), np.array(labels)                                                       
 
 def Steering_Model(cameraFormat=(3, 66, 200)):
     """
     The intent is a scaled down version of the model from "End to End Learning
     for Self-Driving Cars": https://arxiv.org/abs/1604.07316.
-    Args:
-      cameraFormat: (3-tuple) Ints to specify the input dimensions (color
-          channels, rows, columns).
-    Returns:
-      A compiled Keras model.
+
     """
     print('Start building model')
 
@@ -180,11 +224,11 @@ model = Steering_Model()
 # Loss function is mean squared error, standard for regression problems
 #adam = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 model.compile(optimizer="adam", loss="mse")
-#8036*3*2*0.8/256=151
-#8036*3*2*0.2/128=76
-history = model.fit_generator(generator('train',256),
-        samples_per_epoch=151, nb_epoch=7,validation_data=generator('valid',128),
-                    nb_val_samples=76)
+#8036*3*2*0.8/256=150.68
+#8036*3*2*0.2/128=75.34
+history = model.fit_generator(data_generator('train',128),
+        samples_per_epoch=38400, nb_epoch=7,validation_data=data_generator('valid',128),
+                    nb_val_samples=9600)
 
 print('Finish training model')
 print('Start save model architecture and weights')
