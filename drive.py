@@ -26,16 +26,19 @@ app = Flask(__name__)
 model = None
 prev_image_array = None
 
-def preprocess_image(image):
-
-    n_row, n_col, n_ch = image.shape
-    # This removes most of the area above the road and small amount below including the hood
-    new_image = image[int(n_row * 0.33):int(n_row * 0.875), :]
-
-    # This is NVIDIA's input parameters
-    new_image = cv2.resize(new_image, (200,66), interpolation=cv2.INTER_AREA)
+def chop_image(img):
+    n_row,n_col, n_ch = img.shape
+    img1 = img[40:135, :]
+    return img1
     
-    return new_image
+def resize_image(img):
+    img1 = cv2.resize(img, (200,66), interpolation=cv2.INTER_AREA)
+    return img1
+
+def preprocess_image(img):
+    img = chop_image(img)
+    img = resize_image(img) 
+    return img
 
 
 @sio.on('telemetry')
