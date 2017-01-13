@@ -52,7 +52,7 @@ def bright_augment(img):
 # This removes most of the area above the road and small amount below including the hood
 def chop_image(img):
     n_row,n_col, n_ch = img.shape
-    img1 = img[int(n_row * 0.33):int(n_row * 0.875), :]
+    img1 = img[40:135, :]
     return img1
     
 def resize_image(img):
@@ -93,7 +93,7 @@ def data_generator(train_or_valid,batch_size):
     #features = np.zeros((batch_size, row, col, 3))
     labels = []
     features = []
-    ajusteed_angle = 0.15
+    ajusteed_angle = 0.25
     df=pd.read_csv(labels_file, sep=',',header=None)
     while True:
         n_sample = 0
@@ -114,34 +114,23 @@ def data_generator(train_or_valid,batch_size):
             #center camera
             if camera_index == 0:
                 flip_index = np.random.randint(2)
-                #flip_index = 0
                 if flip_index == 0:
-                    features.append(img)
-                    labels.append(steer)
-                else:
                     img = cv2.flip(img,1)
-                    features.append(cv2.flip(img,1))
-                    labels.append(steer * (-1.0))
+                    steer = steer * (-1.0)
             #left camera       
             elif camera_index == 1:
                 flip_index = np.random.randint(2)
                 if flip_index == 0:
-                    features.append(img)
-                    labels.append(steer + ajusteed_angle)
-                else:
                     img = cv2.flip(img,1)
-                    features.append(cv2.flip(img,1))
-                    labels.append((steer + ajusteed_angle)* (-1.0))
+                    steer = (steer + ajusteed_angle) * (-1.0)
             #right camera
             else:               
                 flip_index = np.random.randint(2)
                 if flip_index == 0:
-                    labels.append(steer - ajusteed_angle)
-                    features.append(cv2.flip(img,1))
-                else:
                     img = cv2.flip(img,1)
-                    features.append(cv2.flip(img,1))
-                    labels.append((steer - ajusteed_angle) * (-1.0))
+                    steer = (steer - ajusteed_angle) * (-1.0)
+            features.append(img)
+            labels.append(steer)                    
             n_sample = n_sample + 1    
             #if abs(labels[-1]) > 0.05:
             #    n_sample = n_sample + 1
