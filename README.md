@@ -18,7 +18,12 @@ Software requirements:
 ![](/images/simulator.png "simulator")
 
 ## Data and augmentation
-The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
+The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)</br>
+![](/images/picture1.png "simulator")
+![](/images/picture2.png "simulator")
+![](/images/picture3.png "simulator")
+![](/images/picture4.png "simulator")
+![](/images/picture5.png "simulator")
 
 ## Model architecture
 I start with the Nvidia End-to-end learning deep learning architecture.
