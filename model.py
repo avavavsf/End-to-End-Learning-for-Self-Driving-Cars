@@ -16,6 +16,7 @@ from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Activation
 from keras.layers.convolutional import Convolution2D
 from keras.models import model_from_json
 from keras import backend as K
+from keras.optimizers import Adam
 #import pickle
 #import random
 import pandas as pd
@@ -30,10 +31,10 @@ print("Finish software module")
 # Load datadata
 print("Start data loading")
 # need to revise on OSU OSC
-#features_directory = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/'
-#labels_file= '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/driving_log.csv'
-features_directory = './training_data/'
-labels_file= './training_data/driving_log.csv'
+features_directory = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/'
+labels_file= '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/training_data/driving_log.csv'
+#features_directory = './training_data/'
+#labels_file= './training_data/test.csv'
 #define the input image shape
 row = 66
 col = 200
@@ -66,7 +67,14 @@ def read_image(file_name):
     img = bright_augment(img)
     return img
 
+def model_save(model_json,model_h5):
+    json_model = model.to_json()
+    with open(model_json, "w") as f:
+        f.write(json_model)
+    model.save_weights(model_h5)
+
 ## split the data into 80% training, 20% validation
+training_percent = 0.85
 n_ep = 0
 with open(labels_file, mode='r') as f:
     reader = csv.reader(f, delimiter=',')
@@ -76,8 +84,8 @@ n_ep = n_ep - 1
 print('the number of epoch is ', n_ep)    
 arr = np.arange(n_ep)
 np.random.shuffle(arr)
-t = arr[:int(n_ep * 0.8)]
-v = arr[int(n_ep * 0.8):]
+t = arr[:int(n_ep * training_percent)]
+v = arr[int(n_ep * training_percent):]
 
 # the generator
 def data_generator(train_or_valid,batch_size):
@@ -90,7 +98,6 @@ def data_generator(train_or_valid,batch_size):
     while True:
         n_sample = 0
         while n_sample < batch_size:
-            print(n_sample)
             #decide if train batch or valid batch
             if train_or_valid == "train":
                 index = np.random.choice(t, 1)
@@ -99,19 +106,11 @@ def data_generator(train_or_valid,batch_size):
             else:
                 print('wrong key words, sould be either train or valid ')
             #only choose the image 
-            #index = 6913
-
-            print("index",int(index))
-            #camera_index = np.random.randint(3)
-            camera_index = 1
-
-            print("camera_index",camera_index)
-            print(df.values[index+1][0][camera_index])
-            features_file = features_directory + df.values[index+1][0][camera_index].strip()
-            print("floateatures_file",features_file)
-            img = read_image(features_file)
             steer = float(df[3][index+1])
-            print('steer',steer)
+            camera_index = np.random.randint(3)
+            #camera_index = 0
+            features_file = features_directory + df.values[index+1][0][camera_index].strip()
+            img = read_image(features_file)
             #center camera
             if camera_index == 0:
                 flip_index = np.random.randint(2)
@@ -143,7 +142,6 @@ def data_generator(train_or_valid,batch_size):
                     img = cv2.flip(img,1)
                     features.append(cv2.flip(img,1))
                     labels.append((steer - ajusteed_angle) * (-1.0))
-            print(n_sample)
             n_sample = n_sample + 1    
             #if abs(labels[-1]) > 0.05:
             #    n_sample = n_sample + 1
@@ -181,65 +179,69 @@ def Steering_Model(cameraFormat=(3, 66, 200)):
     '''
 
     #filter(24, 5, 5), valid padding, stride 2, input(3, 160, 320), output(24, 78, 158)
-    model.add(Convolution2D(24, 5, 5, init = 'normal', subsample= (2, 2), name='conv1_1'))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(24, 5, 5, init = 'he_normal', subsample= (2, 2), border_mode="valid", name='conv1_1'))
+    model.add(ELU())
     #filter(36, 5, 5), valid padding, stride 2, input(24, 78, 158), output(36, 37, 77)
-    model.add(Convolution2D(36, 5, 5, init = 'normal', subsample= (2, 2), name='conv2_1'))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(36, 5, 5, init = 'he_normal', subsample= (2, 2), border_mode="valid", name='conv2_1'))
+    model.add(ELU())
     #filter(48, 5, 5), valid padding, stride 2, input(36, 37, 77), output(48, 17, 37)
-    model.add(Convolution2D(48, 5, 5, init = 'normal', subsample= (2, 2), name='conv3_1'))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(48, 5, 5, init = 'he_normal', subsample= (2, 2), border_mode="valid", name='conv3_1'))
+    model.add(ELU())
     #filter(64, 3, 3), valid padding, stride 1, input(48, 17, 37), output(64, 15, 35)
-    model.add(Convolution2D(64, 3, 3, init = 'normal', subsample= (1, 1), name='conv4_1'))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(64, 3, 3, init = 'he_normal', subsample= (1, 1), border_mode="valid", name='conv4_1'))
+    model.add(ELU())
     #filter(64, 3, 3), valid padding, stride 1, input(64, 15, 35), output(64, 13, 33)
-    model.add(Convolution2D(64, 3, 3, init = 'normal', subsample= (1, 1), name='conv4_2'))
-    model.add(Activation('relu'))
+    model.add(Convolution2D(64, 3, 3, init = 'he_normal', subsample= (1, 1), border_mode="valid", name='conv4_2'))
+    model.add(ELU())
     #input(64, 13, 33),output 27456
     model.add(Flatten())
     #input 27456,output 1164
-    model.add(Dense(1164, init = 'normal', name = "dense_0"))
-    model.add(Activation('relu'))
+    model.add(Dense(1164, init = 'he_normal', name = "dense_0"))
+    model.add(ELU())
     #model.add(Dropout(p))
-    model.add(Dense(100, init = 'normal',  name = "dense_1"))
-    model.add(Activation('relu'))
+    model.add(Dense(100, init = 'he_normal',  name = "dense_1"))
+    model.add(ELU())
     #model.add(Dropout(p))
-    model.add(Dense(50, init = 'normal', name = "dense_2"))
-    model.add(Activation('relu'))
+    model.add(Dense(50, init = 'he_normal', name = "dense_2"))
+    model.add(ELU())
     #model.add(Dropout(p))
-    model.add(Dense(10, init = 'normal', name = "dense_3"))
-    model.add(Activation('relu'))
-    model.add(Dense(1, init = 'normal', name = "dense_4"))
+    model.add(Dense(10, init = 'he_normal', name = "dense_3"))
+    model.add(ELU())
+    model.add(Dense(1, init = 'he_normal', name = "dense_4"))
 
     model.summary()    
 
     return model
 
 print('Finish building model')
-print('Start training model')
 
-#train
 model = Steering_Model()
 # Adam optimizer is a standard, efficient SGD optimization method
 # Loss function is mean squared error, standard for regression problems
-#adam = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-model.compile(optimizer="adam", loss="mse")
-#8036*3*2*0.8/256=150.68
-#8036*3*2*0.2/128=75.34
-history = model.fit_generator(data_generator('train',128),
-        samples_per_epoch=38400, nb_epoch=7,validation_data=data_generator('valid',128),
-                    nb_val_samples=9600)
+adam = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+model.compile(optimizer=adam, loss="mse")
 
-print('Finish training model')
-print('Start save model architecture and weights')
-#save the model architecture
-json_model = model.to_json()
-#with open("/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model.json", "w") as f:
-#    f.write(json_model)
-with open("./model.json", "w") as f:
-    f.write(json_model)
-#save the model weights
-#model.save_weights("/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model.h5")
-model.save_weights("./model.h5")
+#training and saving model
+val_best = 9999
+train_best_index = 0
+for i_train in range(20):
+
+    history = model.fit_generator(data_generator('train',128),
+            samples_per_epoch=8036*3*2*training_percent, nb_epoch=1,validation_data=data_generator('valid',64),
+                        nb_val_samples=8036*3*2*(1.0-training_percent))
+
+    model_json = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model_' + str(i_train) + '.json'
+    model_h5 = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model_' + str(i_train) + '.h5'
+    model_save(model_json,model_h5)
+
+    val_loss = history.history['val_loss'][0]
+    if val_loss < val_best:
+        train_best_index = i_train 
+        val_best = val_loss
+        model_json = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model_best.json'
+        model_h5 = '/users/PAS0947/osu8077/new/udacity/P3-CarND-Behavioral-Cloning/model_best.h5'
+        model_save(model_json,model_h5)
+print('Best model found at iteration # ' + str(train_best_index))
+print('Best Validation score : ' + str(np.round(val_best,4)))
 print('Finish save model architecture and weights')
 
