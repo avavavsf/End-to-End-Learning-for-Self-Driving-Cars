@@ -19,19 +19,19 @@ Software requirements:
 #### The simulator
 ![](/images/simulator.png "simulator")
 
-## Data and augmentation
-The Training data can be dolownded from [here]
-From the following figure, we can see that the training data is not banlanced, so we need augment it. I use two ways to augment/preprocess the data:</br> 
+## Data
+The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip). This is the training data on track one provided by Udacity. We did not collect our own data because of the difficulty of collecting data using keyborad.</br>
+Sample data from cameras:</br>
+![](/images/picture2.png "simulator")
+Statistics of the steering angles from Udacity data:
+![](/images/picture1.png "simulator")
+
+
+## Augmentation/Preprocessing
+From above, we can see that the training data is not banlanced, so we need augment it. I use two ways to augment/preprocess the data:</br> 
 1. **Use Left/right camera** - Images from left/right camera are also used by modifiying the steering angle with 0.25. We should notice that, adding a constant angle to steering is a simplified version of shifting left and right cameras, but not the best way. But in our case, this simplificaiton is good enough.</br> 
 2. **Flip the images** - Flip the images from all three cameras to account for the situation of driving in the opposite way.This also increase our training data.</br> 
 
-
-(https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)</br>
-![](/images/picture1.png "simulator")
-![](/images/picture2.png "simulator")
-![](/images/picture3.png "simulator")
-![](/images/picture4.png "simulator")
-![](/images/picture5.png "simulator")
 
 ## Model architecture
 I start with the Nvidia End-to-end learning deep learning architecture. But it turns out that it is very difficult to train Nvidia models with our training data, because our data is not big enough to fully train the Nvidia model unless very heavy augmentation techquies is implemented, such as the discription [here](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.p9gqjosuv).
