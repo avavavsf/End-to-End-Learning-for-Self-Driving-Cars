@@ -28,9 +28,13 @@ Statistics of the steering angles from Udacity data:
 
 
 ## Augmentation/Preprocessing
-From above, we can see that the training data is not banlanced, so we need augment it. I use two ways to augment/preprocess the data:</br> 
-1. **Use Left/right camera** - Images from left/right camera are also used by modifiying the steering angle with 0.25. We should notice that, adding a constant angle to steering is a simplified version of shifting left and right cameras, but not the best way. But in our case, this simplificaiton is good enough.</br> 
-2. **Flip the images** - Flip the images from all three cameras to account for the situation of driving in the opposite way.This also increase our training data.</br> 
+From above, we can see that the training data is not banlanced, so we need augment it. I use three ways to augment/preprocess the data:</br> 
+
+1. **Resize and change color space** -resize the input image seize to (16,32), and change to HSV color channel. In the final architecures, We only use the S channel. I also tried used all three RGB or HSV channel but the S channel only produce the best results in my case.
+2. **Use Left/right camera** - Images from left/right camera are also used by modifiying the steering angle with 0.25. We should notice that, adding a constant angle to steering is a simplified version of shifting left and right cameras, but not the best way. But in our case, this simplificaiton is good enough.</br> 
+3. **Flip the images** - Flip the images from all three cameras to account for the situation of driving in the opposite way.This also increase our training data.</br> 
+
+I also shuffle and split the data in to training and validation datasets. But the best way to validate and test the resultsing model is to run in on both track.
 
 
 ## Model architecture
@@ -50,5 +54,5 @@ Untill I saw the model of Mengxi Wu, he then wrote a article introducing his [ti
 11. Dense layer with 1 neuron</br> 
 </br>
 ## Hyperparameters
+Adam optimizer with leraning rate 0.001 and batch size 128.
 
-## Results
