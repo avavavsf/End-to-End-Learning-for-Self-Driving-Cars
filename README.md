@@ -47,13 +47,16 @@ From above, we can see that the training data is not banlanced, so we need augme
 2. **Use Left/right camera** - Images from left/right camera are also used by modifiying the steering angle with 0.25. We should notice that, adding a constant angle to steering is a simplified version of shifting left and right cameras, but not the best way. But in our case, this simplificaiton is good enough.</br> 
 3. **Flip the images** - Flip the images from all three cameras to account for the situation of driving in the opposite way.This also increase our training data.</br> 
 
-I also shuffle and split the data in to training and validation datasets. But the best way to validate and test the resultsing model is to run in on both track.
+I also shuffle and split the data in to training(90%) and validation(10%) datasets. But the best way to validate and test the resultsing model is to run in on both track.</br>
+
+Because we resize the image size to (16,32), which largely reduced the training data size, we did not use the generator.
 
 
 ## Model architecture
 I start with the Nvidia End-to-end learning deep learning architecture. But it turns out that it is very difficult to train Nvidia models with our training data, because our data is not big enough to fully train the Nvidia model unless very heavy augmentation techquies is implemented, such as the discription [here](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.p9gqjosuv).
 Untill I saw the model of Mengxi Wu, he then wrote a article introducing his [tiny model](https://medium.com/@xslittlegrass/self-driving-car-in-a-simulator-with-a-tiny-neural-network-13d33b871234#.8fj065dgy). I realized that I need a much smaller model compared Nvidia's, to better match my training data. Here is the model architecture which works in my case.</br>
 </br>
+0. Input data normorlization
 1. Convolution layer with 3x3 kernel and 1x1 stride</br>
 2. relu activation layer</br>
 3. MaxPooling with 2x2 pool size
@@ -67,5 +70,5 @@ Untill I saw the model of Mengxi Wu, he then wrote a article introducing his [ti
 11. Dense layer with 1 neuron</br> 
 </br>
 ## Hyperparameters
-Adam optimizer with leraning rate 0.001 and batch size 128.
+Adam optimizer with default leraning rate 0.001 and batch size 128.
 
