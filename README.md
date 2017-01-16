@@ -18,8 +18,7 @@ This is the third project of the Udactiy's Self-Driving Car Nanodegree. In this 
 
 #### Steps to train and run the model
 1. Download the data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
-2. Open the simulator and select autonomous mode</br>
-3. Train and run the model 
+2. Train and run the model 
 
 ```
 python model.py
@@ -28,7 +27,7 @@ python drive.py model.json
 
 ```
 
-4. Open the simulator and select autonomous mode</br>
+Finally open the simulator and select autonomous mode</br>
 
 #### The simulator front page
 ![](/images/simulator.png "simulator")
