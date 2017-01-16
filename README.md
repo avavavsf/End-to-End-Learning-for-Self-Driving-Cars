@@ -19,12 +19,10 @@ Software requirements:
 #### Steps to train and run the model
 1. Download the data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
 2. Train the model 
-```
-python model.py
+```python model.py
 ```
 3. Run the model 
-```
-python drive.py model.json
+```python drive.py model.json
 ```
 4. Open the simulator and select autonomous mode</br>
 
