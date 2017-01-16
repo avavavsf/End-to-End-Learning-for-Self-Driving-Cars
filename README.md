@@ -8,7 +8,7 @@ This is the third project of the Udactiy's Self-Driving Car Nanodegree. In this 
 
 
 ## Software
-Software requirements:
+#### Software requirements:
 * numpy, flask-socketio, eventlet, pillow, h5py, keras, Tensorflow</br>
 * Simulator can be found at:</br>
 [Windows 64 bit](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f3a4_simulator-windows-64/simulator-windows-64.zip)</br>
@@ -18,16 +18,12 @@ Software requirements:
 
 #### Steps to train and run the model
 1. Download the data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
-2. Train the model 
+2. Open the simulator and select autonomous mode</br>
+3. Train and run the model 
 
 ```
 python model.py
 
-```
-
-3. Run the model
-
-```
 python drive.py model.json
 
 ```
