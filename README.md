@@ -17,14 +17,14 @@ Software requirements:
 [Linux](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f0f7_simulator-linux/simulator-linux.zip)</br>
 
 #### The simulator
-![](/images/simulator.png =100x "simulator")
+![](/images/simulator.png "simulator")
 
 ## Data
 The Training data can be dolownded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip). This is the training data on track one provided by Udacity. We did not collect our own data because of the difficulty of collecting data using keyborad.</br>
 Sample data from cameras:</br>
-![](/images/picture2.png "simulator")
+![](/images/picture3.png "simulator")
 Statistics of the steering angles from Udacity data:
-![](/images/picture1.png "simulator")
+![](/images/picture2.png "simulator")
 
 
 ## Augmentation/Preprocessing
