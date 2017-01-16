@@ -36,17 +36,19 @@ From the following figure, we can see that the training data is not banlanced, s
 ## Model architecture
 I start with the Nvidia End-to-end learning deep learning architecture. But it turns out that it is very difficult to train Nvidia models with our training data, because our data is not big enough to fully train the Nvidia model unless very heavy augmentation techquies is implemented, such as the discription [here](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.p9gqjosuv).
 Untill I saw the model of Mengxi Wu, he then wrote a article introducing his [tiny model](https://medium.com/@xslittlegrass/self-driving-car-in-a-simulator-with-a-tiny-neural-network-13d33b871234#.8fj065dgy). I realized that I need a much smaller model compared Nvidia's, to better match my training data. Here is the model architecture which works in my case.</br>
-1. **Convolution layer with 3x3 kernel and 1x1 stride</br>
-2. **relu activation layer</br>
-3. **MaxPooling with 2x2 pool size
-4. **Convolution layer with 3x3 kernel and 1x1 stride</br>
-5. **relu activation layer</br>
-6. **MaxPooling with 2x2 pool size</br>
-7. **Dropout - Prevents overfitting.</br> 
-8. **Flatten</br>
-9. **Dense layer with 50 neuron</br>
-10. **relu activation layer</br>
-11. **Dense layer with 1 neuron</br> 
+</br>
+1. Convolution layer with 3x3 kernel and 1x1 stride</br>
+2. relu activation layer</br>
+3. MaxPooling with 2x2 pool size
+4. Convolution layer with 3x3 kernel and 1x1 stride</br>
+5. relu activation layer</br>
+6. MaxPooling with 2x2 pool size</br>
+7. Dropout - Prevents overfitting.</br> 
+8. Flatten</br>
+9. Dense layer with 50 neuron</br>
+10. relu activation layer</br>
+11. Dense layer with 1 neuron</br> 
+</br>
 ## Hyperparameters
 
 ## Results
