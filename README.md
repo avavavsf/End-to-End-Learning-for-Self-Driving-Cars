@@ -17,16 +17,17 @@ Software requirements:
 [Linux](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f0f7_simulator-linux/simulator-linux.zip)</br>
 
 #### Steps to train and run the model
-1. **Download the data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
-2. **Train the model 
-'''
+1. Download the data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
+2. Train the model 
+```
 python model.py
-'''
-3. **Run the model 
-'''
+```
+3. Run the model 
+```
 python drive.py model.json
-'''
-4. **Open the simulator and select autonomous mode
+```
+4. Open the simulator and select autonomous mode</br>
+
 #### The simulator front page
 ![](/images/simulator.png "simulator")
 
