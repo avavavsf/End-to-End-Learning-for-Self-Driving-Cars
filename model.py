@@ -90,7 +90,7 @@ def steering_model():
     model.add(Activation('relu'))
     model.add(MaxPooling2D((2,2),border_mode='valid'))
 
-    #model.add(Dropout(0.2))
+    model.add(Dropout(0.2))
     model.add(Flatten())
     model.add(Dense(50))
     model.add(Activation('relu'))
