@@ -69,6 +69,10 @@ Untill I saw the model of Mengxi Wu, he then wrote a article introducing his [ti
 10. relu activation layer</br>
 11. Dense layer with 1 neuron</br> 
 </br>
-## Hyperparameters
-Adam optimizer with default leraning rate 0.001 and batch size 128.
+## Tuning and Hyperparameters
+I have been trying to adopt SGD optimizer with learning rate 0.01, 0.001, 0.0005 and 0.0001,and also different batch size and training epoch. For batch size, I tried 64, 128 and 256; and training epoch ranging from 10 to 50. It is really a lot of work and you just have to try to see how the simulated car behave. 
+
+I found that: there is really no help to train more than 10 epochs even if the validation accuracy is keeping decrease; that Adam optimizer is better because of its adaptive learning rates; batch size 128 can do a good job.
+
+So finnay I settled with Adam optimizer with default leraning rate 0.001, batch size 128 and traing epoch 10.
 
