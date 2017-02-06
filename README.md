@@ -1,7 +1,7 @@
 # End-to-End-Learning-for-Self-Driving-Cars
 
 ## Introduction
-This is the third project of the Udactiy's Self-Driving Car Nanodegree. In this project, we trained a Convulutional Nerual Network model to learn to adjust the steering wheels to keep the car on the road. During training, the input to the model is the images aquired from three cameras behind the windshield of the simulated car. However during the test, we only rely on the images acquited from the central camera to steer the simulated car. The final test videos on the two track are here.
+This is the third project of the Udactiy's Self-Driving Car Nanodegree. In this project, we trained a Convulutional Nerual Network model to learn to adjust the steering wheels to keep the car on the road. During training, the input to the model is the images aquired from three cameras behind the windshield of the simulated car. However during the test, we only rely on the images acquited from the central camera to steer the simulated car. The final test videos on the two track are here.</br>
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/Epqb7tTIe6s/0.jpg)](https://youtu.be/Epqb7tTIe6s "a small networkd ")
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/gnh3lAgt-MU/0.jpg)](https://youtu.be/gnh3lAgt-MU "a small networkd ")
 
